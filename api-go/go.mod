@@ -1,6 +1,6 @@
-module api-go
+module teaching-open
 
-go 1.18
+go 1.21
 
 require github.com/gogf/gf/v2 v2.7.1
 

@@ -1,3 +1,35 @@
+v3.0.0-dev (2024-12-03) - Golang重构版本
+【架构升级】
+- 后端从Java/Spring Boot迁移到Golang/GoFrame V2.7.1
+- 前端保持Vue2不变(后续会迁移到Vue3)
+- 使用标准RESTful API设计
+- 采用MVC + 领域驱动设计架构
+
+【已完成功能】
+- DAO层代码生成(sys_user表)
+- 用户登录接口(POST /api/v1/sys/login)
+  * MD5+salt密码加密
+  * JWT token生成(2小时有效期)
+- 用户管理CRUD接口
+  * 用户列表查询(GET /api/v1/sys/user/list) - 支持分页、模糊搜索、状态筛选
+  * 新增用户(POST /api/v1/sys/user) - 自动生成salt、密码加密
+  * 编辑用户(PUT /api/v1/sys/user) - 支持部分字段更新
+  * 删除用户(DELETE /api/v1/sys/user/:id) - 逻辑删除
+  * 用户详情(GET /api/v1/sys/user/:id)
+- 中间件系统
+  * CORS跨域处理
+  * 请求日志记录
+  * 全局错误处理
+  * JWT认证中间件
+- 健康检查接口(GET /api/v1/health)
+
+【技术栈】
+- GoFrame V2.7.1
+- MySQL 8.0
+- Redis 6.0+
+- JWT认证
+- 服务端口: 8199
+
 v2.8
 文章资讯功能
 作品打标签功能

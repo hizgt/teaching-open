@@ -1,0 +1,567 @@
+package sys
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
+
+	v1 "teaching-open/api/v1/sys"
+	"teaching-open/internal/dao"
+	"teaching-open/internal/model/entity"
+	"teaching-open/internal/service"
+)
+
+func init() {
+	service.RegisterTeachingDepartDayLog(NewTeachingDepartDayLogLogic())
+}
+
+type sTeachingDepartDayLog struct{}
+
+func NewTeachingDepartDayLogLogic() *sTeachingDepartDayLog {
+	return &sTeachingDepartDayLog{}
+}
+
+// GetReport 统计报表
+func (s *sTeachingDepartDayLog) GetReport(ctx context.Context, req *v1.DepartDayLogGetReportReq) (list []*v1.DepartDayLogInfo, total int64, err error) {
+	m := dao.TeachingDepartDayLog.Ctx(ctx)
+
+	// 班级ID查询
+	if req.DepartId != "" {
+		m = m.Where("depart_id", req.DepartId)
+	}
+
+	// 日期范围查询
+	if req.StartDate != "" {
+		m = m.WhereGTE("create_time", req.StartDate)
+	}
+	if req.EndDate != "" {
+		m = m.WhereLTE("create_time", req.EndDate)
+	}
+
+	// 统计总数
+	count, err := m.Count()
+	if err != nil {
+		return nil, 0, err
+	}
+	total = int64(count)
+
+	// 排序
+	sortField := "create_time"
+	if req.SortField != "" {
+		sortField = req.SortField
+	}
+	sortOrder := "DESC"
+	if req.SortOrder != "" && (req.SortOrder == "asc" || req.SortOrder == "ASC") {
+		sortOrder = "ASC"
+	}
+	orderBy := fmt.Sprintf("%s %s", sortField, sortOrder)
+
+	// 分页查询
+	pageNo := req.PageNo
+	pageSize := req.PageSize
+	if pageNo <= 0 {
+		pageNo = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	var entities []*entity.TeachingDepartDayLog
+	err = m.Order(orderBy).Page(pageNo, pageSize).Scan(&entities)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 转换为响应格式
+	for _, e := range entities {
+		list = append(list, &v1.DepartDayLogInfo{
+			Id:                         e.Id,
+			DepartId:                   e.DepartId,
+			DepartName:                 e.DepartName,
+			UnitOpenCount:              e.UnitOpenCount,
+			CourseWorkAssignCount:      e.CourseWorkAssignCount,
+			AdditionalWorkAssignCount:  e.AdditionalWorkAssignCount,
+			CourseWorkCorrectCount:     e.CourseWorkCorrectCount,
+			AdditionalWorkCorrectCount: e.AdditionalWorkCorrectCount,
+			CourseWorkSubmitCount:      e.CourseWorkSubmitCount,
+			AdditionalWorkSubmitCount:  e.AdditionalWorkSubmitCount,
+			CreateTime:                 e.CreateTime,
+		})
+	}
+
+	return list, total, nil
+}
+
+// GetReportGroupByDepart 按部门统计
+func (s *sTeachingDepartDayLog) GetReportGroupByDepart(ctx context.Context, req *v1.DepartDayLogGroupByDepartReq) (list []*v1.DepartStatInfo, total int64, err error) {
+	m := dao.TeachingDepartDayLog.Ctx(ctx)
+
+	// 日期范围查询
+	if req.StartDate != "" {
+		m = m.WhereGTE("create_time", req.StartDate)
+	}
+	if req.EndDate != "" {
+		m = m.WhereLTE("create_time", req.EndDate)
+	}
+
+	// 按部门分组聚合统计
+	type DepartStatRow struct {
+		DepartId                   string `json:"departId"`
+		DepartName                 string `json:"departName"`
+		TotalUnitOpen              int64  `json:"totalUnitOpen"`
+		TotalCourseWorkAssign      int64  `json:"totalCourseWorkAssign"`
+		TotalAdditionalWorkAssign  int64  `json:"totalAdditionalWorkAssign"`
+		TotalCourseWorkCorrect     int64  `json:"totalCourseWorkCorrect"`
+		TotalAdditionalWorkCorrect int64  `json:"totalAdditionalWorkCorrect"`
+		TotalCourseWorkSubmit      int64  `json:"totalCourseWorkSubmit"`
+		TotalAdditionalWorkSubmit  int64  `json:"totalAdditionalWorkSubmit"`
+		DayCount                   int64  `json:"dayCount"`
+	}
+
+	var rows []DepartStatRow
+	err = m.Fields(
+		"depart_id as departId",
+		"MAX(depart_name) as departName",
+		"COALESCE(SUM(unit_open_count), 0) as totalUnitOpen",
+		"COALESCE(SUM(course_work_assign_count), 0) as totalCourseWorkAssign",
+		"COALESCE(SUM(additional_work_assign_count), 0) as totalAdditionalWorkAssign",
+		"COALESCE(SUM(course_work_correct_count), 0) as totalCourseWorkCorrect",
+		"COALESCE(SUM(additional_work_correct_count), 0) as totalAdditionalWorkCorrect",
+		"COALESCE(SUM(course_work_submit_count), 0) as totalCourseWorkSubmit",
+		"COALESCE(SUM(additional_work_submit_count), 0) as totalAdditionalWorkSubmit",
+		"COUNT(*) as dayCount",
+	).Group("depart_id").OrderDesc("totalCourseWorkSubmit").Scan(&rows)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	total = int64(len(rows))
+
+	// 分页
+	pageNo := req.PageNo
+	pageSize := req.PageSize
+	if pageNo <= 0 {
+		pageNo = 1
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+
+	start := (pageNo - 1) * pageSize
+	end := start + pageSize
+	if start >= len(rows) {
+		return []*v1.DepartStatInfo{}, total, nil
+	}
+	if end > len(rows) {
+		end = len(rows)
+	}
+
+	// 转换为响应格式
+	for _, row := range rows[start:end] {
+		list = append(list, &v1.DepartStatInfo{
+			DepartId:                   row.DepartId,
+			DepartName:                 row.DepartName,
+			TotalUnitOpen:              row.TotalUnitOpen,
+			TotalCourseWorkAssign:      row.TotalCourseWorkAssign,
+			TotalAdditionalWorkAssign:  row.TotalAdditionalWorkAssign,
+			TotalCourseWorkCorrect:     row.TotalCourseWorkCorrect,
+			TotalAdditionalWorkCorrect: row.TotalAdditionalWorkCorrect,
+			TotalCourseWorkSubmit:      row.TotalCourseWorkSubmit,
+			TotalAdditionalWorkSubmit:  row.TotalAdditionalWorkSubmit,
+			DayCount:                   row.DayCount,
+		})
+	}
+
+	return list, total, nil
+}
+
+// GetReportGroupByMonth 按月份统计
+func (s *sTeachingDepartDayLog) GetReportGroupByMonth(ctx context.Context, req *v1.DepartDayLogGroupByMonthReq) (list []*v1.MonthStatInfo, err error) {
+	m := dao.TeachingDepartDayLog.Ctx(ctx)
+
+	// 班级ID查询
+	if req.DepartId != "" {
+		m = m.Where("depart_id", req.DepartId)
+	}
+
+	// 日期范围查询
+	if req.StartDate != "" {
+		m = m.WhereGTE("create_time", req.StartDate)
+	}
+	if req.EndDate != "" {
+		m = m.WhereLTE("create_time", req.EndDate)
+	}
+
+	// 按月份分组聚合统计
+	type MonthStatRow struct {
+		Month                      string `json:"month"`
+		TotalUnitOpen              int64  `json:"totalUnitOpen"`
+		TotalCourseWorkAssign      int64  `json:"totalCourseWorkAssign"`
+		TotalAdditionalWorkAssign  int64  `json:"totalAdditionalWorkAssign"`
+		TotalCourseWorkCorrect     int64  `json:"totalCourseWorkCorrect"`
+		TotalAdditionalWorkCorrect int64  `json:"totalAdditionalWorkCorrect"`
+		TotalCourseWorkSubmit      int64  `json:"totalCourseWorkSubmit"`
+		TotalAdditionalWorkSubmit  int64  `json:"totalAdditionalWorkSubmit"`
+		DayCount                   int64  `json:"dayCount"`
+	}
+
+	var rows []MonthStatRow
+	err = m.Fields(
+		"DATE_FORMAT(create_time, '%Y-%m') as month",
+		"COALESCE(SUM(unit_open_count), 0) as totalUnitOpen",
+		"COALESCE(SUM(course_work_assign_count), 0) as totalCourseWorkAssign",
+		"COALESCE(SUM(additional_work_assign_count), 0) as totalAdditionalWorkAssign",
+		"COALESCE(SUM(course_work_correct_count), 0) as totalCourseWorkCorrect",
+		"COALESCE(SUM(additional_work_correct_count), 0) as totalAdditionalWorkCorrect",
+		"COALESCE(SUM(course_work_submit_count), 0) as totalCourseWorkSubmit",
+		"COALESCE(SUM(additional_work_submit_count), 0) as totalAdditionalWorkSubmit",
+		"COUNT(*) as dayCount",
+	).Group("DATE_FORMAT(create_time, '%Y-%m')").Order("month ASC").Scan(&rows)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// 转换为响应格式
+	for _, row := range rows {
+		list = append(list, &v1.MonthStatInfo{
+			Month:                      row.Month,
+			TotalUnitOpen:              row.TotalUnitOpen,
+			TotalCourseWorkAssign:      row.TotalCourseWorkAssign,
+			TotalAdditionalWorkAssign:  row.TotalAdditionalWorkAssign,
+			TotalCourseWorkCorrect:     row.TotalCourseWorkCorrect,
+			TotalAdditionalWorkCorrect: row.TotalAdditionalWorkCorrect,
+			TotalCourseWorkSubmit:      row.TotalCourseWorkSubmit,
+			TotalAdditionalWorkSubmit:  row.TotalAdditionalWorkSubmit,
+			DayCount:                   row.DayCount,
+		})
+	}
+
+	return list, nil
+}
+
+// UnitViewLog 记录单元查看日志
+func (s *sTeachingDepartDayLog) UnitViewLog(ctx context.Context, req *v1.DepartDayLogUnitViewReq) error {
+	// 获取当前日期
+	now := gtime.Now()
+	today := now.Format("Y-m-d")
+
+	// 如果没有部门ID，从用户信息中获取（可能需要实现）
+	departId := req.DepartId
+	if departId == "" {
+		// TODO: 从JWT或session中获取用户所属部门
+		g.Log().Warning(ctx, "UnitViewLog: DepartId is empty")
+		return nil // 不是错误，只是没有部门信息
+	}
+
+	// 查询部门名称
+	var depart entity.SysDepart
+	err := dao.SysDepart.Ctx(ctx).Where("id", departId).Scan(&depart)
+	if err != nil && err != gdb.ErrRecordNotFound {
+		return err
+	}
+	departName := depart.DepartName
+
+	// 查询当天的日志记录
+	var log entity.TeachingDepartDayLog
+	err = dao.TeachingDepartDayLog.Ctx(ctx).
+		Where("depart_id", departId).
+		Where("create_time", today).
+		Scan(&log)
+
+	if err != nil && err != gdb.ErrRecordNotFound {
+		return err
+	}
+
+	// 如果记录存在，更新开课次数
+	if log.Id != "" {
+		_, err = dao.TeachingDepartDayLog.Ctx(ctx).
+			Where("id", log.Id).
+			Data(g.Map{
+				"unit_open_count": gdb.Raw("unit_open_count + 1"),
+			}).Update()
+		return err
+	}
+
+	// 记录不存在，创建新记录
+	newLog := &entity.TeachingDepartDayLog{
+		Id:                         fmt.Sprintf("%d", time.Now().UnixNano()),
+		DepartId:                   departId,
+		DepartName:                 departName,
+		UnitOpenCount:              1,
+		CourseWorkAssignCount:      0,
+		AdditionalWorkAssignCount:  0,
+		CourseWorkCorrectCount:     0,
+		AdditionalWorkCorrectCount: 0,
+		CourseWorkSubmitCount:      0,
+		AdditionalWorkSubmitCount:  0,
+		CreateTime:                 gtime.NewFromStr(today),
+	}
+
+	_, err = dao.TeachingDepartDayLog.Ctx(ctx).Insert(newLog)
+	return err
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}	return err	_, err = dao.TeachingDepartDayLog.Ctx(ctx).Insert(newLog)	}		CreateTime:                 gtime.NewFromStr(today),		AdditionalWorkSubmitCount:  0,		CourseWorkSubmitCount:      0,		AdditionalWorkCorrectCount: 0,		CourseWorkCorrectCount:     0,		AdditionalWorkAssignCount:  0,		CourseWorkAssignCount:      0,		UnitOpenCount:              1,		DepartName:                 departName,		DepartId:                   departId,		Id:                         fmt.Sprintf("%d", time.Now().UnixNano()),	newLog := &entity.TeachingDepartDayLog{	// 记录不存在，创建新记录	}		return err			}).Update()				"unit_open_count": gdb.Raw("unit_open_count + 1"),			Data(g.Map{			Where("id", log.Id).		_, err = dao.TeachingDepartDayLog.Ctx(ctx).	if log.Id != "" {	// 如果记录存在，更新开课次数	}		return err	if err != nil && err != gdb.ErrRecordNotFound {		Scan(&log)		Where("create_time", today).		Where("depart_id", departId).	err = dao.TeachingDepartDayLog.Ctx(ctx).	var log entity.TeachingDepartDayLog	// 查询当天的日志记录	departName := depart.DepartName	}		return err	if err != nil && err != gdb.ErrRecordNotFound {	err := dao.SysDepart.Ctx(ctx).Where("id", departId).Scan(&depart)	var depart entity.SysDepart	// 查询部门名称	}		return nil // 不是错误，只是没有部门信息		g.Log().Warning(ctx, "UnitViewLog: DepartId is empty")		// TODO: 从JWT或session中获取用户所属部门	if departId == "" {	departId := req.DepartId	// 如果没有部门ID，从用户信息中获取（可能需要实现）	today := now.Format("Y-m-d")	now := gtime.Now()	// 获取当前日期func (s *sTeachingDepartDayLog) UnitViewLog(ctx context.Context, req *v1.DepartDayLogUnitViewReq) error {// UnitViewLog 记录单元查看日志}	return list, nil	}		})			DayCount:                   row.DayCount,			TotalAdditionalWorkSubmit:  row.TotalAdditionalWorkSubmit,			TotalCourseWorkSubmit:      row.TotalCourseWorkSubmit,			TotalAdditionalWorkCorrect: row.TotalAdditionalWorkCorrect,			TotalCourseWorkCorrect:     row.TotalCourseWorkCorrect,			TotalAdditionalWorkAssign:  row.TotalAdditionalWorkAssign,			TotalCourseWorkAssign:      row.TotalCourseWorkAssign,			TotalUnitOpen:              row.TotalUnitOpen,			Month:                      row.Month,		list = append(list, &v1.MonthStatInfo{	for _, row := range rows {	// 转换为响应格式	}		return nil, err	if err != nil {	).Group("DATE_FORMAT(create_time, '%Y-%m')").Order("month ASC").Scan(&rows)		"COUNT(*) as dayCount",		"COALESCE(SUM(additional_work_submit_count), 0) as totalAdditionalWorkSubmit",		"COALESCE(SUM(course_work_submit_count), 0) as totalCourseWorkSubmit",		"COALESCE(SUM(additional_work_correct_count), 0) as totalAdditionalWorkCorrect",		"COALESCE(SUM(course_work_correct_count), 0) as totalCourseWorkCorrect",		"COALESCE(SUM(additional_work_assign_count), 0) as totalAdditionalWorkAssign",		"COALESCE(SUM(course_work_assign_count), 0) as totalCourseWorkAssign",		"COALESCE(SUM(unit_open_count), 0) as totalUnitOpen",		"DATE_FORMAT(create_time, '%Y-%m') as month",	err = m.Fields(	var rows []MonthStatRow	}		DayCount                   int64  `json:"dayCount"`		TotalAdditionalWorkSubmit  int64  `json:"totalAdditionalWorkSubmit"`		TotalCourseWorkSubmit      int64  `json:"totalCourseWorkSubmit"`		TotalAdditionalWorkCorrect int64  `json:"totalAdditionalWorkCorrect"`		TotalCourseWorkCorrect     int64  `json:"totalCourseWorkCorrect"`		TotalAdditionalWorkAssign  int64  `json:"totalAdditionalWorkAssign"`		TotalCourseWorkAssign      int64  `json:"totalCourseWorkAssign"`		TotalUnitOpen              int64  `json:"totalUnitOpen"`		Month                      string `json:"month"`	type MonthStatRow struct {	// 按月份分组聚合统计	}		m = m.WhereLTE("create_time", req.EndDate)	if req.EndDate != "" {	}		m = m.WhereGTE("create_time", req.StartDate)	if req.StartDate != "" {	// 日期范围查询	}		m = m.Where("depart_id", req.DepartId)	if req.DepartId != "" {	// 班级ID查询	m := dao.TeachingDepartDayLog.Ctx(ctx)func (s *sTeachingDepartDayLog) GetReportGroupByMonth(ctx context.Context, req *v1.DepartDayLogGroupByMonthReq) (list []*v1.MonthStatInfo, err error) {// GetReportGroupByMonth 按月份统计}	return list, total, nil	}		})			DayCount:                   row.DayCount,			TotalAdditionalWorkSubmit:  row.TotalAdditionalWorkSubmit,			TotalCourseWorkSubmit:      row.TotalCourseWorkSubmit,			TotalAdditionalWorkCorrect: row.TotalAdditionalWorkCorrect,			TotalCourseWorkCorrect:     row.TotalCourseWorkCorrect,			TotalAdditionalWorkAssign:  row.TotalAdditionalWorkAssign,			TotalCourseWorkAssign:      row.TotalCourseWorkAssign,			TotalUnitOpen:              row.TotalUnitOpen,			DepartName:                 row.DepartName,			DepartId:                   row.DepartId,		list = append(list, &v1.DepartStatInfo{	for _, row := range rows[start:end] {	// 转换为响应格式	}		end = len(rows)	if end > len(rows) {	}		return []*v1.DepartStatInfo{}, total, nil	if start >= len(rows) {	end := start + pageSize	start := (pageNo - 1) * pageSize	}		pageSize = 10	if pageSize <= 0 {	}		pageNo = 1	if pageNo <= 0 {	pageSize := req.PageSize	pageNo := req.PageNo	// 分页	total = int64(len(rows))	}		return nil, 0, err	if err != nil {	).Group("depart_id").OrderDesc("totalCourseWorkSubmit").Scan(&rows)		"COUNT(*) as dayCount",		"COALESCE(SUM(additional_work_submit_count), 0) as totalAdditionalWorkSubmit",		"COALESCE(SUM(course_work_submit_count), 0) as totalCourseWorkSubmit",		"COALESCE(SUM(additional_work_correct_count), 0) as totalAdditionalWorkCorrect",		"COALESCE(SUM(course_work_correct_count), 0) as totalCourseWorkCorrect",		"COALESCE(SUM(additional_work_assign_count), 0) as totalAdditionalWorkAssign",		"COALESCE(SUM(course_work_assign_count), 0) as totalCourseWorkAssign",		"COALESCE(SUM(unit_open_count), 0) as totalUnitOpen",		"MAX(depart_name) as departName",		"depart_id as departId",	err = m.Fields(	var rows []DepartStatRow	}		DayCount                   int64  `json:"dayCount"`		TotalAdditionalWorkSubmit  int64  `json:"totalAdditionalWorkSubmit"`		TotalCourseWorkSubmit      int64  `json:"totalCourseWorkSubmit"`		TotalAdditionalWorkCorrect int64  `json:"totalAdditionalWorkCorrect"`		TotalCourseWorkCorrect     int64  `json:"totalCourseWorkCorrect"`		TotalAdditionalWorkAssign  int64  `json:"totalAdditionalWorkAssign"`		TotalCourseWorkAssign      int64  `json:"totalCourseWorkAssign"`		TotalUnitOpen              int64  `json:"totalUnitOpen"`		DepartName                 string `json:"departName"`		DepartId                   string `json:"departId"`	type DepartStatRow struct {	// 按部门分组聚合统计	}		m = m.WhereLTE("create_time", req.EndDate)	if req.EndDate != "" {	}		m = m.WhereGTE("create_time", req.StartDate)	if req.StartDate != "" {	// 日期范围查询	m := dao.TeachingDepartDayLog.Ctx(ctx)func (s *sTeachingDepartDayLog) GetReportGroupByDepart(ctx context.Context, req *v1.DepartDayLogGroupByDepartReq) (list []*v1.DepartStatInfo, total int64, err error) {// GetReportGroupByDepart 按部门统计}	return list, total, nil	}		})			CreateTime:                 e.CreateTime,			AdditionalWorkSubmitCount:  e.AdditionalWorkSubmitCount,			CourseWorkSubmitCount:      e.CourseWorkSubmitCount,			AdditionalWorkCorrectCount: e.AdditionalWorkCorrectCount,			CourseWorkCorrectCount:     e.CourseWorkCorrectCount,			AdditionalWorkAssignCount:  e.AdditionalWorkAssignCount,			CourseWorkAssignCount:      e.CourseWorkAssignCount,			UnitOpenCount:              e.UnitOpenCount,			DepartName:                 e.DepartName,			DepartId:                   e.DepartId,			Id:                         e.Id,		list = append(list, &v1.DepartDayLogInfo{	for _, e := range entities {	// 转换为响应格式	}		return nil, 0, err	if err != nil {	err = m.Order(orderBy).Page(pageNo, pageSize).Scan(&entities)	var entities []*entity.TeachingDepartDayLog	}		pageSize = 10	if pageSize <= 0 {	}		pageNo = 1	if pageNo <= 0 {	pageSize := req.PageSize	pageNo := req.PageNo	// 分页查询	orderBy := fmt.Sprintf("%s %s", sortField, sortOrder)	}		sortOrder = "ASC"	if req.SortOrder != "" && (req.SortOrder == "asc" || req.SortOrder == "ASC") {	sortOrder := "DESC"	}		sortField = req.SortField	if req.SortField != "" {	sortField := "create_time"	// 排序	total = int64(count)	}		return nil, 0, err	if err != nil {	count, err := m.Count()	// 统计总数	}		m = m.WhereLTE("create_time", req.EndDate)	if req.EndDate != "" {	}		m = m.WhereGTE("create_time", req.StartDate)	if req.StartDate != "" {	// 日期范围查询	}		m = m.Where("depart_id", req.DepartId)	if req.DepartId != "" {	// 班级ID查询	m := dao.TeachingDepartDayLog.Ctx(ctx)func (s *sTeachingDepartDayLog) GetReport(ctx context.Context, req *v1.DepartDayLogGetReportReq) (list []*v1.DepartDayLogInfo, total int64, err error) {// GetReport 统计报表}	return &sTeachingDepartDayLog{}func NewTeachingDepartDayLogLogic() *sTeachingDepartDayLog {type sTeachingDepartDayLog struct{}}	service.RegisterTeachingDepartDayLog(NewTeachingDepartDayLogLogic())func init() {)	"teaching-open/internal/service"	"teaching-open/internal/model/entity"	"teaching-open/internal/dao"	v1 "teaching-open/api/v1/sys"	"github.com/gogf/gf/v2/os/gtime"	"github.com/gogf/gf/v2/frame/g"	"github.com/gogf/gf/v2/database/gdb"	"time"	"fmt"	"context"import (

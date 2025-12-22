@@ -7,7 +7,7 @@ package hello
 import (
 	"context"
 
-	"api-go/api/hello/v1"
+	v1 "teaching-open/api/hello/v1"
 )
 
 type IHelloV1 interface {

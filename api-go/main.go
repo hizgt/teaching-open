@@ -1,11 +1,12 @@
 package main
 
 import (
-	_ "api-go/internal/packed"
+	_ "teaching-open/internal/logic/sys"
+	_ "teaching-open/internal/packed"
 
 	"github.com/gogf/gf/v2/os/gctx"
 
-	"api-go/internal/cmd"
+	"teaching-open/internal/cmd"
 )
 
 func main() {

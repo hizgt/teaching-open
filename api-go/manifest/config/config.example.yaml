@@ -1,0 +1,62 @@
+# Teaching Open 配置文件示例
+# 复制此文件为 config.yaml 并修改相应配置
+
+# 服务器配置
+server:
+  address: ":8080"
+  serverRoot: "resource/public"
+  logPath: "logs/server"
+  logStdout: true
+  errorLogEnabled: true
+  accessLogEnabled: true
+  graceful: true
+
+# 数据库配置
+database:
+  default:
+    link: "mysql:your_username:your_password@tcp(127.0.0.1:3306)/teachingopen"
+    debug: true
+    charset: "utf8mb4"
+    maxIdle: 10
+    maxOpen: 100
+    maxLifetime: "30s"
+
+# Redis配置
+redis:
+  default:
+    address: "127.0.0.1:6379"
+    db: 0
+    pass: "your_redis_password"
+    maxActive: 100
+
+# 日志配置
+logger:
+  path: "logs"
+  level: "all"
+  stdout: true
+
+# JWT配置
+jwt:
+  secret: "your-super-secret-jwt-key-change-this-in-production"
+  expire: "2h"        # 访问Token过期时间
+  refreshExpire: "168h"  # 刷新Token过期时间（7天）
+
+# 上传配置
+upload:
+  path: "resource/upload"
+  maxSize: 10485760  # 10MB
+
+# 认证配置
+auth:
+  maxDevices: 5      # 最大设备数
+  enableAutoRefresh: true
+  refreshThreshold: "30m"  # 自动刷新阈值
+  enableRateLimit: true
+  rateLimitDuration: "1m"
+  rateLimitMaxRequests: 60
+
+# 跨域配置
+cors:
+  allowOrigin: "*"
+  allowMethods: "GET,POST,PUT,DELETE,OPTIONS"
+  allowHeaders: "Origin,Content-Type,Accept,X-Access-Token,Authorization"

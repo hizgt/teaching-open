@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
+	_ "teaching-open/api/v1/teaching" // 自动路由绑定
 	"teaching-open/api/middleware"
 )
 

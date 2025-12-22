@@ -1,0 +1,11 @@
+gfcli:
+  gen:
+    dao:
+    - link: "mysql:root:password@tcp(127.0.0.1:3306)/teachingopen"
+      tables: "teaching_course,teaching_course_unit,teaching_course_dept"
+      removePrefix: "teaching_"
+      descriptionTag: true
+      noModelComment: false
+      path: "./internal"
+      group: "default"
+      jsonCase: "CamelLower"

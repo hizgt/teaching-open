@@ -15,7 +15,7 @@ def run_command(cmd, description=""):
     print(f"{'='*60}")
     
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd="/workspaces/teaching-open")
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, cwd="/root/teaching")
         
         if result.stdout:
             print(result.stdout)
@@ -32,7 +32,7 @@ def run_command(cmd, description=""):
         return False
 
 def main():
-    os.chdir("/workspaces/teaching-open")
+    os.chdir("/root/teaching")
     
     print("""
 ╔══════════════════════════════════════════════════════╗

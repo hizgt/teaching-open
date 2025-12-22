@@ -5,7 +5,7 @@ echo ""
 
 # 步骤1: 清理临时文件
 echo "步骤1: 清理临时文件..."
-cd /workspaces/teaching-open
+cd /root/teaching
 rm -f api-go/internal/service/sys_user_new.go
 rm -f api-go/internal/service/sys_user_service.go
 rm -f api-go/utility/response/res.go
@@ -14,7 +14,7 @@ echo ""
 
 # 步骤2: 整理依赖
 echo "步骤2: 整理依赖 (go mod tidy)..."
-cd /workspaces/teaching-open
+cd /root/teaching
 cd api-go
 go mod tidy
 if [ $? -eq 0 ]; then

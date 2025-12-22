@@ -10,7 +10,7 @@ echo "  Teaching Open - 数据库启动与 DAO 生成"
 echo "================================================"
 echo ""
 
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 
 # ==================== 第一步：启动数据库 ====================
 echo "[1/5] 检查并启动 MySQL 数据库..."
@@ -55,7 +55,7 @@ TABLES=$(docker exec teaching-open-mysql mysql -uroot -proot -N -e "USE teaching
 if [ -z "$TABLES" ]; then
     echo "数据库表不存在，需要导入 SQL 文件..."
     echo "导入 teachingopen2.8.sql..."
-    docker exec -i teaching-open-mysql mysql -uroot -proot teachingopen < /workspaces/teaching-open/api/db/teachingopen2.8.sql
+    docker exec -i teaching-open-mysql mysql -uroot -proot teachingopen < /root/teaching/api/db/teachingopen2.8.sql
     echo "✅ SQL 导入完成"
 else
     echo "✅ 数据库表已存在:"

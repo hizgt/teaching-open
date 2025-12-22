@@ -2,7 +2,7 @@
 
 # Git 提交脚本 - 第一阶段完成
 
-cd /workspaces/teaching-open
+cd /root/teaching
 
 echo "================================"
 echo "准备提交 GoFrame 项目基础设施"
@@ -80,7 +80,7 @@ git commit -m "feat(backend): 完成 GoFrame 项目基础设施搭建
 ## 注意事项
 由于文件创建过程中出现了一些混乱，需要手动执行以下命令:
 \`\`\`bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 rm -f utility/response/response.go utility/jwt/jwt.go api/middleware/auth.go
 mv utility/response/resp.go utility/response/response.go
 mv utility/jwt/token.go utility/jwt/jwt.go

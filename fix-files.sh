@@ -2,7 +2,7 @@
 
 # 清理损坏的文件并测试编译
 
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 
 echo "=== 清理损坏的文件 ==="
 

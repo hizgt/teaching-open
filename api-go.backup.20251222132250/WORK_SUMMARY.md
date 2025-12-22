@@ -726,7 +726,7 @@ api-go/
 ### 修改文件
 
 ```
-/workspaces/teaching-open/
+/root/teaching/
 ├── changelist.txt                              # 版本更新记录
 ├── docs/20251122/
 │   ├── 前后端接口报告.md                        # 接口文档
@@ -764,7 +764,7 @@ api-go/
 如需手动测试编译,执行以下命令:
 
 ```bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 go mod tidy
 go build -v
 ```
@@ -881,7 +881,7 @@ curl -X GET "http://localhost:8199/api/v1/sys/user/list?page=1&pageSize=10" \
 
 ### 1. 终端文件系统错误
 
-**问题描述**: VS Code终端出现"ENOPRO: 未找到资源 file:///workspaces/teaching-open/api-go 的文件系统提供程序"错误
+**问题描述**: VS Code终端出现"ENOPRO: 未找到资源 file:///root/teaching/api-go 的文件系统提供程序"错误
 
 **影响**: 无法直接在终端执行go命令(go build, go run等)
 
@@ -1020,7 +1020,7 @@ chmod +x git-commit-user-module.sh
 
 或手动执行:
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 git add api-go/ changelist.txt docs/
 git commit -F git_commit_message.txt
 git push origin devgo
@@ -1032,7 +1032,7 @@ git push origin devgo
 
 ```bash
 #!/bin/bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 echo "整理依赖..."
 go mod tidy
 echo "编译项目..."

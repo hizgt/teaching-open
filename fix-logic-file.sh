@@ -5,7 +5,7 @@ set -e
 
 echo "开始修复teaching_depart_day_log.go文件..."
 
-cd /workspaces/teaching-open/api-go/internal/logic/sys
+cd /root/teaching/api-go/internal/logic/sys
 
 # 备份原文件
 cp teaching_depart_day_log.go teaching_depart_day_log.go.bak
@@ -21,7 +21,7 @@ echo "原文件备份: teaching_depart_day_log.go.bak"
 # 验证编译
 echo ""
 echo "验证编译..."
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 if go build -o /tmp/teaching-open-test 2>&1; then
     echo "✅ 编译成功!"
     rm -f /tmp/teaching-open-test
@@ -32,4 +32,4 @@ fi
 
 echo ""
 echo "修复完成! 现在可以提交代码了"
-echo "运行: cd /workspaces/teaching-open && git add . && git commit -m 'fix: Phase 12 logic文件格式修复' && git push origin devgo"
+echo "运行: cd /root/teaching && git add . && git commit -m 'fix: Phase 12 logic文件格式修复' && git push origin devgo"

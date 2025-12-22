@@ -152,7 +152,7 @@ Phase 12-13: 后端完成 + 前端规划 + 完整DAO层生成
 
 ```bash
 # 进入项目目录
-cd /workspaces/teaching-open
+cd /root/teaching
 
 # 执行自动提交脚本
 bash git-commit-all.sh

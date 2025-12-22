@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 生成DAO层代码的脚本
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 
 echo "开始生成DAO层代码..."
 echo "工作目录: $(pwd)"

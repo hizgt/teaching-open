@@ -2,7 +2,7 @@
 
 # 清理和重建工具类文件
 
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 
 echo "=== 清理损坏的文件 ==="
 

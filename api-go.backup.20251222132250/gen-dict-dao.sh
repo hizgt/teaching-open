@@ -8,7 +8,7 @@ echo "  GoFrame CLI - 生成字典管理 DAO 层代码"
 echo "================================================"
 echo ""
 
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 
 # 检查 gf 命令
 if ! command -v gf &> /dev/null; then

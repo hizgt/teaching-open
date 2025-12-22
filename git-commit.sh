@@ -8,7 +8,7 @@ echo "  Git提交 - 文件上传管理模块"
 echo "================================================"
 echo ""
 
-cd /workspaces/teaching-open
+cd /root/teaching
 
 echo "当前分支: $(git branch --show-current)"
 echo ""

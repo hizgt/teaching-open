@@ -20,7 +20,7 @@
 ### 1. Git提交Phase 12代码
 
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 git add -A
 git commit -m "Phase 12: 部门日志统计完成 - 4 APIs (teaching_depart_day_log)
 
@@ -39,7 +39,7 @@ git push origin devgo
 
 ```bash
 # 方式1: 自动化脚本
-cd /workspaces/teaching-open
+cd /root/teaching
 bash init-phase13-vue3.sh
 
 # 方式2: 手动执行(如果脚本失败)

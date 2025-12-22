@@ -115,7 +115,7 @@ api-go/
 
 #### 方法1: Bash命令修复 (推荐)
 ```bash
-cd /workspaces/teaching-open/api-go/internal/logic/sys
+cd /root/teaching/api-go/internal/logic/sys
 head -308 teaching_depart_day_log.go > temp.go
 mv temp.go teaching_depart_day_log.go
 ```
@@ -132,7 +132,7 @@ git checkout HEAD -- api-go/internal/logic/sys/teaching_depart_day_log.go
 
 **验证修复**:
 ```bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 go build  # 应无错误输出
 ```
 
@@ -147,7 +147,7 @@ echo "编译成功!" && rm /tmp/teaching-open
 
 #### Step 2: Git提交
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 git add .
 git commit -m "Phase 12: 部门日志统计模块完成
 
@@ -325,7 +325,7 @@ web-vue3/
 
 2. **验证编译** (2分钟)
    ```bash
-   cd /workspaces/teaching-open/api-go
+   cd /root/teaching/api-go
    go build
    ```
 

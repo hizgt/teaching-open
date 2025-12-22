@@ -114,7 +114,7 @@
 ### 最简单的方法 (推荐)
 
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 bash git-commit-all.sh
 ```
 
@@ -271,7 +271,7 @@ git status               # 确认工作区清洁
 **现在就执行提交吧!**
 
 ```bash
-cd /workspaces/teaching-open && bash git-commit-all.sh
+cd /root/teaching && bash git-commit-all.sh
 ```
 
 所有工作已完成,所有检查已通过,所有文档已准备好。

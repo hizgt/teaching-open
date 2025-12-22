@@ -12,7 +12,7 @@
 ### 方案 A: 使用提供的脚本 (推荐)
 
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 bash git-commit-all.sh
 ```
 
@@ -27,7 +27,7 @@ bash git-commit-all.sh
 
 ```bash
 # 进入项目目录
-cd /workspaces/teaching-open
+cd /root/teaching
 
 # 暂存所有变更
 git add -A
@@ -331,13 +331,13 @@ Utility:       6个文件, ~600行
 执行以下命令开始提交:
 
 ```bash
-cd /workspaces/teaching-open && bash git-commit-all.sh
+cd /root/teaching && bash git-commit-all.sh
 ```
 
 或使用传统命令:
 
 ```bash
-cd /workspaces/teaching-open && git add -A && git commit -m "Phase 12-13..." && git push origin devgo
+cd /root/teaching && git add -A && git commit -m "Phase 12-13..." && git push origin devgo
 ```
 
 **祝提交顺利!** 🎉

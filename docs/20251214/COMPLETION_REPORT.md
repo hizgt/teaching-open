@@ -150,7 +150,7 @@ cd api-go && go build
 #### 步骤1: Git提交Phase 12 (优先级P0)
 
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 git add -A
 git commit -m "Phase 12: 部门日志统计完成 - 4 APIs (teaching_depart_day_log)
 
@@ -171,7 +171,7 @@ git push origin devgo
 
 **方式1: 自动化脚本(推荐)**
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 bash init-phase13-vue3.sh
 ```
 
@@ -193,7 +193,7 @@ mkdir -p src/{api,assets/{images,styles},components,composables,hooks,layouts,ro
 #### 步骤3: 复制配置文件 (优先级P0)
 
 ```bash
-cd /workspaces/teaching-open/web-vue3
+cd /root/teaching/web-vue3
 
 # Vite配置
 cp ../docs/20251214/vite.config.example.ts ./vite.config.ts

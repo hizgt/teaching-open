@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_DIR="/workspaces/teaching-open"
+PROJECT_DIR="/root/teaching"
 cd "$PROJECT_DIR"
 
 echo "=================================="

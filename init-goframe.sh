@@ -24,7 +24,7 @@ echo ""
 
 # 2. 创建项目目录
 echo "步骤 2: 创建项目目录..."
-cd /workspaces/teaching-open
+cd /root/teaching
 if [ -d "api-go" ]; then
     echo "检测到已存在的 api-go 目录，正在备份..."
     mv api-go api-go.backup.$(date +%Y%m%d%H%M%S)
@@ -99,7 +99,7 @@ echo "================================"
 echo "✓ 项目初始化完成！"
 echo "================================"
 echo ""
-echo "项目路径: /workspaces/teaching-open/api-go"
+echo "项目路径: /root/teaching/api-go"
 echo ""
 echo "下一步操作:"
 echo "1. cd api-go"

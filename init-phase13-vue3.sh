@@ -10,7 +10,7 @@ echo "========================================="
 # 1. 创建Vue3项目
 echo ""
 echo "步骤1: 创建Vue3+Vite项目..."
-cd /workspaces/teaching-open
+cd /root/teaching
 npm create vite@latest web-vue3 -- --template vue-ts
 
 # 2. 进入项目目录

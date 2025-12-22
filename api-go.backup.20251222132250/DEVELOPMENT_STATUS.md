@@ -38,7 +38,7 @@
 由于文件创建过程中出现了一些混乱，需要手动重命名以下文件：
 
 ```bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 
 # 1. 删除损坏的文件
 rm -f utility/response/response.go
@@ -59,7 +59,7 @@ go build
 
 ### 1. 生成 DAO 层
 ```bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 gf gen dao
 ```
 
@@ -84,7 +84,7 @@ gf gen dao
 ## 编译命令
 
 ```bash
-cd /workspaces/teaching-open/api-go
+cd /root/teaching/api-go
 go mod tidy
 go build -o teaching-open
 ./teaching-open
@@ -121,5 +121,5 @@ curl http://localhost:8199/api/v1/health
 
 - 配置文件: `manifest/config/config.yaml`
 - DAO配置: `hack/config.yaml`
-- 开发指南: `/workspaces/teaching-open/docs/goFrameV2 dev guide.md`
-- 接口文档: `/workspaces/teaching-open/docs/20251122/前后端接口报告.md`
+- 开发指南: `/root/teaching/docs/goFrameV2 dev guide.md`
+- 接口文档: `/root/teaching/docs/20251122/前后端接口报告.md`

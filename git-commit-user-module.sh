@@ -9,7 +9,7 @@ echo "================================================"
 echo ""
 
 # 切换到项目根目录
-cd /workspaces/teaching-open
+cd /root/teaching
 
 # 配置Git用户信息(如果需要)
 echo "检查Git配置..."

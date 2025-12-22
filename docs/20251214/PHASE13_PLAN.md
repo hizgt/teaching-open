@@ -12,7 +12,7 @@
 ### 1.1 创建Vue3项目
 
 ```bash
-cd /workspaces/teaching-open
+cd /root/teaching
 npm create vite@latest web-vue3 -- --template vue-ts
 cd web-vue3
 npm install

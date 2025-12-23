@@ -1,6 +1,75 @@
 # Teaching Open 项目变更日志
 
+## [3.0.0-dev] - 2025-12-23
+
+### 项目分析与文档更新 ✅
+
+#### Added
+- 分析了整个项目内容，梳理PRD和changelog
+- 生成了新的未完成工作报告到 `docs/20251223/未完成工作报告.md`
+- 更新了前后端接口报告到 `docs/20251223/前后端接口报告.md`
+- 按前后端职能划分了待办事项和工作量评估
+
+#### Documentation
+- 明确了当前开发状态：后端已完成90%，前端Vue3重构准备就绪
+- 识别了主要未完成工作：前端开发、测试部署、性能优化
+- 制定了详细的开发计划和风险评估
+
+---
+
 ## [3.0.0-dev] - 2025-12-22
+
+### 认证中间件增强 ✅
+
+#### Added
+- JWT自动刷新功能：实现Token自动续期机制
+- 多设备登录限制：限制同一用户同时在线设备数量
+- 认证中间件优化：完善安全验证和错误处理
+
+---
+
+### 课程API开发完成 ✅
+
+#### Added
+- **课程管理接口 (10个)** ✅
+  - `GET /api/v1/teaching/teachingCourse/list` - 课程列表（分页、筛选）
+  - `GET /api/v1/teaching/teachingCourse/getHomeCourse` - 首页课程列表
+  - `POST /api/v1/teaching/teachingCourse/add` - 添加课程
+  - `PUT /api/v1/teaching/teachingCourse/edit` - 编辑课程
+  - `DELETE /api/v1/teaching/teachingCourse/delete` - 删除课程
+  - `DELETE /api/v1/teaching/teachingCourse/deleteBatch` - 批量删除课程
+  - `GET /api/v1/teaching/teachingCourse/queryById` - 课程详情
+  - `PUT /api/v1/teaching/teachingCourse/publish` - 发布/下架课程
+  - `PUT /api/v1/teaching/teachingCourse/setShared` - 设置共享状态
+  - `POST /api/v1/teaching/teachingCourse/authorizeDept` - 授权课程给部门
+
+- **课程单元管理接口 (8个)** ✅
+  - `GET /api/v1/teaching/teachingCourseUnit/list` - 单元列表（分页）
+  - `GET /api/v1/teaching/teachingCourseUnit/queryByCourseId` - 课程所有单元
+  - `POST /api/v1/teaching/teachingCourseUnit/add` - 添加单元
+  - `PUT /api/v1/teaching/teachingCourseUnit/edit` - 编辑单元
+  - `DELETE /api/v1/teaching/teachingCourseUnit/delete` - 删除单元
+  - `DELETE /api/v1/teaching/teachingCourseUnit/deleteBatch` - 批量删除单元
+  - `GET /api/v1/teaching/teachingCourseUnit/queryById` - 单元详情
+  - `PUT /api/v1/teaching/teachingCourseUnit/sort` - 单元排序
+
+- **班级课程管理接口 (6个)** ✅
+  - `GET /api/v1/teaching/teachingCourseDept/list` - 班级课程列表
+  - `GET /api/v1/teaching/teachingCourseDept/queryByDeptId` - 班级的课程列表
+  - `GET /api/v1/teaching/teachingCourseDept/queryByCourseId` - 课程授权班级列表
+  - `POST /api/v1/teaching/teachingCourseDept/addOrUpdate` - 添加/更新班级课程
+  - `DELETE /api/v1/teaching/teachingCourseDept/delete` - 删除班级课程
+  - `POST /api/v1/teaching/teachingCourseDept/batchAdd` - 批量添加班级课程
+
+#### 技术实现细节
+- 课程软删除：del_flag 标记删除
+- 首页展示：show_home 字段控制首页展示
+- 共享课程：is_shared 字段控制课程共享
+- 部门授权：depart_ids 字段存储授权部门
+- 课程单元：支持视频、PPT、作业、教案等多种资源
+- 单元排序：支持拖拽排序
+
+---
 
 ### 文档分析与报告生成
 

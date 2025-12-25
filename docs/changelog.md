@@ -2,6 +2,49 @@
 
 ## [3.0.0-dev] - 2025-12-25
 
+### 角色权限模块完善 ✅
+
+#### Added
+- **权限Service层实现**
+  - `sys_permission.go` - 权限服务（权限树查询、用户菜单查询、权限编码查询）
+  - 实现 GetTree、GetById、Create、Update、Delete 方法
+  - 实现 GetUserPermission、GetUserMenus、GetUserPermCodes 方法
+  - 支持权限树递归构建和菜单过滤
+
+- **角色Controller层实现**
+  - `sys_role.go` - 角色控制器（列表、增删改查、用户角色、角色权限）
+  - 实现角色列表分页查询
+  - 实现用户角色关联管理
+  - 实现角色权限分配
+
+- **权限Controller层实现**
+  - `sys_permission.go` - 权限控制器（树列表、增删改查、用户权限）
+  - 实现权限树查询接口
+  - 实现用户菜单和权限编码查询
+
+- **路由注册更新**
+  - 新增 `/sys/role/*` 角色管理路由组（11个接口）
+  - 新增 `/sys/permission/*` 权限管理路由组（8个接口）
+
+- **工具类完善**
+  - `response.go` - 新增 SuccessMsg、PageSuccess 方法
+
+#### Fixed
+- 修复 `password.go` 中 rand.Int 调用错误
+- 修复 Transaction 方法调用方式（改用 g.DB().Transaction）
+- 修复 int/int64 类型转换问题
+- 修复 teaching_course.go 中缺少 CourseDetailReq 定义
+
+#### 技术实现细节
+- 权限树构建：递归构建，按 sortNo 排序
+- 菜单过滤：只返回 menuType=0 或 1 的菜单项
+- 权限编码：支持逗号分隔的多权限编码
+- 事务处理：使用 g.DB().Transaction 确保数据一致性
+
+---
+
+## [3.0.0-dev] - 2025-12-25
+
 ### 核心模块代码完善 ✅
 
 #### Added

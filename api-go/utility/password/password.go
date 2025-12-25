@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"time"
 )
 
 // GenerateSalt 生成随机盐值
@@ -13,7 +14,7 @@ func GenerateSalt() string {
 	_, err := rand.Read(bytes)
 	if err != nil {
 		// 如果随机生成失败，使用时间戳作为备选
-		return fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%d", rand.Int()))))[:16]
+		return fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprintf("%d", time.Now().UnixNano()))))[:16]
 	}
 	return hex.EncodeToString(bytes)
 }

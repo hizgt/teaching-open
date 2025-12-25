@@ -82,7 +82,7 @@ func (s *sysDictServiceImpl) List(ctx context.Context, req *DictListReq) (*DictL
 
 	return &DictListRes{
 		Records:  dicts,
-		Total:    total,
+		Total:    int64(total),
 		Page:     req.Page,
 		PageSize: req.PageSize,
 	}, nil

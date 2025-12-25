@@ -4,10 +4,8 @@ import (
 	"context"
 	"teaching-open/internal/model/vo"
 	"teaching-open/internal/service"
-	"teaching-open/utility/response"
 
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/net/ghttp"
 )
 
 // TeachingCourseController 课程控制器

@@ -96,3 +96,8 @@ type CoursePublishReq struct {
 type CourseDeleteReq struct {
 	Id string `json:"id" v:"required" dc:"课程ID"`
 }
+
+// CourseDetailReq 课程详情请求
+type CourseDetailReq struct {
+	Id string `json:"id" v:"required" dc:"课程ID"`
+}

@@ -86,3 +86,15 @@ func ForbiddenExit(r *ghttp.Request, message string) {
 func TooManyRequestsExit(r *ghttp.Request, message string) {
 	JsonExit(r, 429, message)
 }
+
+
+// SuccessMsg 返回成功消息响应
+func SuccessMsg(r *ghttp.Request, message string) {
+	Json(r, 200, message)
+}
+
+// PageSuccess 返回分页成功响应
+func PageSuccess(r *ghttp.Request, records interface{}, total int, current, size int) {
+	pageResult := NewPageResult(records, int64(total), size, current)
+	Success(r, pageResult)
+}

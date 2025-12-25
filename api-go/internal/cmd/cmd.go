@@ -50,6 +50,10 @@ func registerRoutes(s *ghttp.Server) {
 	loginCtrl := system.NewLoginController()
 	// 用户控制器
 	userCtrl := system.NewSysUserController()
+	// 角色控制器
+	roleCtrl := system.NewSysRoleController()
+	// 权限控制器
+	permCtrl := system.NewSysPermissionController()
 
 	// 系统模块路由组
 	s.Group("/sys", func(group *ghttp.RouterGroup) {
@@ -72,6 +76,33 @@ func registerRoutes(s *ghttp.Server) {
 			userGroup.DELETE("/deleteBatch", userCtrl.DeleteBatch)
 			userGroup.PUT("/resetPassword", userCtrl.ResetPassword)
 			userGroup.GET("/queryById", userCtrl.QueryById)
+		})
+
+		// 角色管理
+		group.Group("/role", func(roleGroup *ghttp.RouterGroup) {
+			roleGroup.GET("/list", roleCtrl.List)
+			roleGroup.GET("/queryAll", roleCtrl.QueryAll)
+			roleGroup.GET("/queryById", roleCtrl.QueryById)
+			roleGroup.POST("/add", roleCtrl.Add)
+			roleGroup.PUT("/edit", roleCtrl.Edit)
+			roleGroup.DELETE("/delete", roleCtrl.Delete)
+			roleGroup.DELETE("/deleteBatch", roleCtrl.DeleteBatch)
+			roleGroup.GET("/queryUserRole", roleCtrl.QueryUserRole)
+			roleGroup.POST("/saveUserRole", roleCtrl.SaveUserRole)
+			roleGroup.GET("/queryRolePermission", roleCtrl.QueryRolePermission)
+			roleGroup.POST("/saveRolePermission", roleCtrl.SaveRolePermission)
+		})
+
+		// 权限管理
+		group.Group("/permission", func(permGroup *ghttp.RouterGroup) {
+			permGroup.GET("/list", permCtrl.List)
+			permGroup.GET("/queryById", permCtrl.QueryById)
+			permGroup.POST("/add", permCtrl.Add)
+			permGroup.PUT("/edit", permCtrl.Edit)
+			permGroup.DELETE("/delete", permCtrl.Delete)
+			permGroup.GET("/getUserPermission", permCtrl.GetUserPermission)
+			permGroup.GET("/getUserMenus", permCtrl.GetUserMenus)
+			permGroup.GET("/getUserPermCodes", permCtrl.GetUserPermCodes)
 		})
 	})
 }

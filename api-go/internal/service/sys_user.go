@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -175,7 +176,7 @@ func (s *sysUserServiceImpl) List(ctx context.Context, req *vo.UserListReq) (*vo
 
 	return &vo.UserListRes{
 		Records:  records,
-		Total:    total,
+		Total:    int64(total),
 		Page:     req.Page,
 		PageSize: req.PageSize,
 	}, nil
@@ -230,7 +231,7 @@ func (s *sysUserServiceImpl) Create(ctx context.Context, req *vo.UserCreateReq, 
 	}
 
 	// 开启事务
-	err = dao.SysUser.Transaction(ctx, func(ctx context.Context, tx g.DB) error {
+	err = g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		// 插入用户
 		_, err := dao.SysUser.Ctx(ctx).Data(user).Insert()
 		if err != nil {
@@ -301,7 +302,7 @@ func (s *sysUserServiceImpl) Update(ctx context.Context, req *vo.UserUpdateReq, 
 	}
 
 	// 开启事务
-	return dao.SysUser.Transaction(ctx, func(ctx context.Context, tx g.DB) error {
+	return g.DB().Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
 		// 更新用户
 		_, err := dao.SysUser.Ctx(ctx).Data(data).Where(dao.SysUser.Columns().Id, req.Id).Update()
 		if err != nil {

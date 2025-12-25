@@ -145,28 +145,28 @@
   - 确保所有测试通过，如有问题请询问用户
 
 - [ ] 7. 角色权限模块
-  - [ ] 7.1 角色实体定义
+  - [x] 7.1 角色实体定义
     - 创建internal/model/entity/sys_role.go
     - 创建internal/model/entity/sys_permission.go
     - 创建internal/model/entity/sys_role_permission.go
     - 创建internal/model/entity/sys_user_role.go
     - _Requirements: 3.1, 3.2_
 
-  - [ ] 7.2 角色DAO层实现
+  - [x] 7.2 角色DAO层实现
     - 创建internal/dao/sys_role.go
     - 创建internal/dao/sys_permission.go
     - 创建internal/dao/sys_role_permission.go
     - 创建internal/dao/sys_user_role.go
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ] 7.3 角色Service层实现
+  - [x] 7.3 角色Service层实现
     - 创建internal/service/sys_role.go
     - 实现ISysRoleService接口
     - 实现角色CRUD
     - 实现角色权限分配
     - _Requirements: 3.1, 3.3_
 
-  - [ ] 7.4 权限Service层实现
+  - [x] 7.4 权限Service层实现
     - 创建internal/service/sys_permission.go
     - 实现ISysPermissionService接口
     - 实现权限树查询
@@ -186,7 +186,7 @@
     - **Property 14: Cache Invalidation on Permission Change**
     - **Validates: Requirements 3.8**
 
-  - [ ] 7.8 角色权限Controller实现
+  - [x] 7.8 角色权限Controller实现
     - 创建internal/controller/system/sys_role.go
     - 创建internal/controller/system/sys_permission.go
     - 实现角色管理接口

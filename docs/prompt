@@ -1,0 +1,20 @@
+分析整个项目的内容，
+1、分析docs下的changelog和梳理过的开发内容，梳理没有开发的prd，生成未完成工作报告到 docs/{timestampYYYYMMDD} ： 
+2、文档与版本控制： 未完成工作报告： 
+3、定期更新 docs/{timestampYYYYMMDD}/未完成工作报告.md，按前后端职能划分待办事项。 
+4、接口文档： 每次开发完成后，务必 更新 docs/{timestampYYYYMMDD}/前后端接口报告.md，确保文档与代码同步。 
+5、变更日志： 将所有功能变更记录到 docs/changelog.md。 
+6、Git 提交： 完成开发、文档和测试后，及时进行 Git 提交，确保代码库同步更新。
+
+
+
+
+编写代码继续进行功能迁移开发
+1、根据梳理的 docs/{timestampYYYYMMDD}/未完成工作报告.md和 changelog 以及分析docs下的内容，
+2、请阅读分析根据docs/goFrame dev guide.md，docs/Vue3 Dev Guide.md和docs/PRD.md 三个文档的代码规范以及现有的代码内容，
+3、对相应的的内容进行相应的开发,请先生成相应的前后端的开发计划，并按照安排进行功能开发，
+4、每个功能开发完成后更新报告，并且要编译通过，并且要通过go build 构建成功才行， changelog 以及进行 git 的修改；将每个任务进行分解到子任务进行分治解决。
+5、为了确保相应的进度同步，请仔细检查docs下的文件，实现更新和开发的进度内容统一，防止数据孤岛将缺失的 changelog 和待完成的内容进行更新和完善，防止遗漏功能点。
+6、开发完相应的模块记得git将修改的内容及时进行git提交，保持代码仓库一致。
+
+

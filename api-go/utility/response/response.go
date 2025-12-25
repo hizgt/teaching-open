@@ -1,6 +1,8 @@
 package response
 
 import (
+	"math"
+
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gtime"
 )
@@ -12,6 +14,30 @@ type Response struct {
 	Result    interface{} `json:"result,omitempty"`
 	Success   bool        `json:"success"`
 	Timestamp int64       `json:"timestamp"`
+}
+
+// PageResult 分页响应格式
+type PageResult struct {
+	Records interface{} `json:"records"`
+	Total   int64       `json:"total"`
+	Size    int         `json:"size"`
+	Current int         `json:"current"`
+	Pages   int         `json:"pages"`
+}
+
+// NewPageResult 创建分页结果
+func NewPageResult(records interface{}, total int64, size, current int) *PageResult {
+	pages := 0
+	if size > 0 {
+		pages = int(math.Ceil(float64(total) / float64(size)))
+	}
+	return &PageResult{
+		Records: records,
+		Total:   total,
+		Size:    size,
+		Current: current,
+		Pages:   pages,
+	}
 }
 
 // Json 返回JSON响应

@@ -1,5 +1,52 @@
 # Teaching Open 项目变更日志
 
+## [3.0.0-dev] - 2025-12-25
+
+### 核心模块代码完善 ✅
+
+#### Added
+- **Entity 实体层完善**
+  - `sys_user.go` - 用户实体定义
+  - `sys_role.go` - 角色实体定义
+  - `sys_permission.go` - 权限实体定义
+  - `sys_depart.go` - 部门实体定义
+  - `sys_dict.go` - 字典实体定义
+  - `sys_log.go` - 日志实体定义
+  - `teaching_work.go` - 作品实体定义
+
+- **DAO 数据访问层完善**
+  - 完整的 internal DAO 实现
+  - 外部 DAO 接口封装
+  - 支持 sys_user, sys_role, sys_depart, sys_dict 等核心表
+
+- **Service 服务层实现**
+  - `sys_user.go` - 用户服务（完整 CRUD、角色权限查询、密码管理）
+  - `login.go` - 登录服务（用户名登录、手机号登录、验证码、Token 管理）
+  - `sys_dict.go` - 字典服务（字典项查询、缓存）
+
+- **Controller 控制器层实现**
+  - `login.go` - 登录控制器（登录、退出、验证码、短信）
+  - `sys_user.go` - 用户管理控制器（列表、增删改查、密码重置）
+
+- **工具类完善**
+  - `password.go` - MD5+Salt 密码加密工具
+  - `redis.go` - Redis 缓存操作工具
+  - `response.go` - 统一响应格式（含分页支持）
+
+#### Documentation
+- 生成 `docs/20251225/未完成工作报告.md` - 更新项目进度和待办事项
+- 生成 `docs/20251225/前后端接口报告.md` - 完整的 API 接口文档（137+ 接口）
+- 更新 `docs/changelog.md` - 记录今日变更
+
+#### 技术实现细节
+- 密码加密：MD5(username + password + 8位随机salt)
+- Token 生成：JWT with 2小时有效期
+- 用户状态：1-正常，2-冻结
+- 逻辑删除：del_flag=1 标记删除
+- 分页查询：支持 page/pageSize 参数
+
+---
+
 ## [3.0.0-dev] - 2025-12-24
 
 ### 文档与任务追踪：生成未完成工作报告 ✅

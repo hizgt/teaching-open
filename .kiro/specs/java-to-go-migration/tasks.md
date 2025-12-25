@@ -144,7 +144,7 @@
 - [ ] 6. Checkpoint - 用户认证模块验证
   - 确保所有测试通过，如有问题请询问用户
 
-- [ ] 7. 角色权限模块
+- [x] 7. 角色权限模块
   - [x] 7.1 角色实体定义
     - 创建internal/model/entity/sys_role.go
     - 创建internal/model/entity/sys_permission.go
@@ -193,19 +193,19 @@
     - 实现权限管理接口
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 8. 部门模块
-  - [ ] 8.1 部门实体定义
+- [x] 8. 部门模块
+  - [x] 8.1 部门实体定义
     - 创建internal/model/entity/sys_depart.go
     - 创建internal/model/entity/sys_user_depart.go
     - 创建internal/model/vo/depart_tree.go
     - _Requirements: 4.1_
 
-  - [ ] 8.2 部门DAO层实现
+  - [x] 8.2 部门DAO层实现
     - 创建internal/dao/sys_depart.go
     - 创建internal/dao/sys_user_depart.go
     - _Requirements: 4.1_
 
-  - [ ] 8.3 部门Service层实现
+  - [x] 8.3 部门Service层实现
     - 创建internal/service/sys_depart.go
     - 实现ISysDepartService接口
     - 实现部门树查询
@@ -218,7 +218,7 @@
     - **Property 7: OrgCode Uniqueness**
     - **Validates: Requirements 4.2, 4.4, 4.7**
 
-  - [ ] 8.5 部门Controller实现
+  - [x] 8.5 部门Controller实现
     - 创建internal/controller/system/sys_depart.go
     - 实现部门树查询接口
     - 实现部门CRUD接口

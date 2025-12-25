@@ -1,5 +1,5 @@
 分析整个项目的内容，
-1、分析docs下的changelog和梳理过的开发内容，梳理没有开发的prd，生成未完成工作报告到 docs/{timestampYYYYMMDD} ： 
+1、分析docs下的changelog,.kiro下的内容和梳理过的开发内容，梳理没有开发的prd，生成未完成工作报告到 docs/{timestampYYYYMMDD} ： 
 2、文档与版本控制： 未完成工作报告： 
 3、定期更新 docs/{timestampYYYYMMDD}/未完成工作报告.md，按前后端职能划分待办事项。 
 4、接口文档： 每次开发完成后，务必 更新 docs/{timestampYYYYMMDD}/前后端接口报告.md，确保文档与代码同步。 

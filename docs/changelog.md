@@ -2,6 +2,49 @@
 
 ## [3.0.0-dev] - 2025-12-25
 
+### 部门管理模块实现 ✅
+
+#### Added
+- **部门VO定义**
+  - `sys_depart.go` - 部门视图对象（树节点、创建/更新请求、搜索请求）
+  - 支持部门树、ID树、部门用户树等多种树形结构
+
+- **部门Service层实现**
+  - `sys_depart.go` - 部门服务（完整CRUD、树查询、OrgCode生成）
+  - 实现 GetTree、GetById、Create、Update、Delete 方法
+  - 实现 GetIdTree、Search、GetUserDeparts、SaveUserDeparts 方法
+  - 实现 GetDepartUserTree 部门用户树查询
+  - OrgCode自动生成：根据父部门编码自动生成子部门编码（格式：A01, A01A01）
+
+- **部门Controller层实现**
+  - `sys_depart.go` - 部门控制器（10个接口）
+  - 实现部门树查询、ID树查询、部门用户树查询
+  - 实现部门CRUD操作
+  - 实现用户部门关联管理
+
+- **路由注册更新**
+  - 新增 `/sys/sysDepart/*` 部门管理路由组（10个接口）
+    - `GET /queryTreeList` - 部门树列表
+    - `GET /queryById` - 部门详情
+    - `POST /add` - 添加部门
+    - `PUT /edit` - 编辑部门
+    - `DELETE /delete` - 删除部门
+    - `GET /queryIdTree` - 部门ID树
+    - `GET /searchBy` - 搜索部门
+    - `GET /queryDepartTreeSync` - 部门用户树
+    - `GET /queryUserDepart` - 查询用户部门
+    - `POST /saveUserDepart` - 保存用户部门
+
+#### 技术实现细节
+- 部门树构建：递归构建，按 departOrder 排序
+- OrgCode生成：顶级部门从A01开始，子部门在父编码后追加A01
+- 递归删除：删除部门时自动删除所有子部门（逻辑删除）
+- 用户关联：支持用户-部门多对多关联
+
+---
+
+## [3.0.0-dev] - 2025-12-25
+
 ### 角色权限模块完善 ✅
 
 #### Added

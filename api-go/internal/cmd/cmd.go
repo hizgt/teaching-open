@@ -54,6 +54,8 @@ func registerRoutes(s *ghttp.Server) {
 	roleCtrl := system.NewSysRoleController()
 	// 权限控制器
 	permCtrl := system.NewSysPermissionController()
+	// 部门控制器
+	departCtrl := system.NewSysDepartController()
 
 	// 系统模块路由组
 	s.Group("/sys", func(group *ghttp.RouterGroup) {
@@ -103,6 +105,20 @@ func registerRoutes(s *ghttp.Server) {
 			permGroup.GET("/getUserPermission", permCtrl.GetUserPermission)
 			permGroup.GET("/getUserMenus", permCtrl.GetUserMenus)
 			permGroup.GET("/getUserPermCodes", permCtrl.GetUserPermCodes)
+		})
+
+		// 部门管理
+		group.Group("/sysDepart", func(departGroup *ghttp.RouterGroup) {
+			departGroup.GET("/queryTreeList", departCtrl.QueryTreeList)
+			departGroup.GET("/queryById", departCtrl.QueryById)
+			departGroup.POST("/add", departCtrl.Add)
+			departGroup.PUT("/edit", departCtrl.Edit)
+			departGroup.DELETE("/delete", departCtrl.Delete)
+			departGroup.GET("/queryIdTree", departCtrl.QueryIdTree)
+			departGroup.GET("/searchBy", departCtrl.SearchBy)
+			departGroup.GET("/queryDepartTreeSync", departCtrl.QueryDepartTreeSync)
+			departGroup.GET("/queryUserDepart", departCtrl.QueryUserDepart)
+			departGroup.POST("/saveUserDepart", departCtrl.SaveUserDepart)
 		})
 	})
 }

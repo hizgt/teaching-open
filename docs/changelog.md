@@ -43,6 +43,40 @@
 
 ---
 
+### 字典管理模块完善 ✅
+
+#### Added
+- **字典VO定义**
+  - `sys_dict.go` - 字典视图对象（列表请求、创建/更新请求、字典项请求）
+
+- **字典Service层扩展**
+  - 新增字典项CRUD方法：ListItems、GetItemById、CreateItem、UpdateItem、DeleteItem
+  - 字典项操作自动清除Redis缓存
+
+- **字典Controller层实现**
+  - `sys_dict.go` - 字典控制器（12个接口）
+  - 实现字典CRUD操作
+  - 实现字典项CRUD操作
+  - 实现表字典查询
+
+- **路由注册更新**
+  - 新增 `/sys/dict/*` 字典管理路由组（8个接口）
+    - `GET /list` - 字典列表
+    - `GET /queryById` - 字典详情
+    - `POST /add` - 添加字典
+    - `PUT /edit` - 编辑字典
+    - `DELETE /delete` - 删除字典
+    - `GET /getDictItems/:dictCode` - 获取字典项
+    - `GET /queryAllDictItems` - 查询所有字典项
+    - `GET /queryTableDictItems` - 查询表字典项
+  - 新增 `/sys/dictItem/*` 字典项管理路由组（4个接口）
+    - `GET /list` - 字典项列表
+    - `POST /add` - 添加字典项
+    - `PUT /edit` - 编辑字典项
+    - `DELETE /delete` - 删除字典项
+
+---
+
 ## [3.0.0-dev] - 2025-12-25
 
 ### 角色权限模块完善 ✅

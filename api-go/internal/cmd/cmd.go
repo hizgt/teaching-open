@@ -56,6 +56,8 @@ func registerRoutes(s *ghttp.Server) {
 	permCtrl := system.NewSysPermissionController()
 	// 部门控制器
 	departCtrl := system.NewSysDepartController()
+	// 字典控制器
+	dictCtrl := system.NewSysDictController()
 
 	// 系统模块路由组
 	s.Group("/sys", func(group *ghttp.RouterGroup) {
@@ -119,6 +121,26 @@ func registerRoutes(s *ghttp.Server) {
 			departGroup.GET("/queryDepartTreeSync", departCtrl.QueryDepartTreeSync)
 			departGroup.GET("/queryUserDepart", departCtrl.QueryUserDepart)
 			departGroup.POST("/saveUserDepart", departCtrl.SaveUserDepart)
+		})
+
+		// 字典管理
+		group.Group("/dict", func(dictGroup *ghttp.RouterGroup) {
+			dictGroup.GET("/list", dictCtrl.List)
+			dictGroup.GET("/queryById", dictCtrl.QueryById)
+			dictGroup.POST("/add", dictCtrl.Add)
+			dictGroup.PUT("/edit", dictCtrl.Edit)
+			dictGroup.DELETE("/delete", dictCtrl.Delete)
+			dictGroup.GET("/getDictItems/:dictCode", dictCtrl.GetDictItems)
+			dictGroup.GET("/queryAllDictItems", dictCtrl.QueryAllDictItems)
+			dictGroup.GET("/queryTableDictItems", dictCtrl.QueryTableDictItems)
+		})
+
+		// 字典项管理
+		group.Group("/dictItem", func(dictItemGroup *ghttp.RouterGroup) {
+			dictItemGroup.GET("/list", dictCtrl.ListItems)
+			dictItemGroup.POST("/add", dictCtrl.AddItem)
+			dictItemGroup.PUT("/edit", dictCtrl.EditItem)
+			dictItemGroup.DELETE("/delete", dictCtrl.DeleteItem)
 		})
 	})
 }

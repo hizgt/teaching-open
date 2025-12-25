@@ -26,6 +26,12 @@ type SysDictService interface {
 	GetDictItems(ctx context.Context, dictCode string) ([]*entity.SysDictItem, error)
 	QueryAllDictItems(ctx context.Context) (map[string][]vo.DictItem, error)
 	QueryTableDictItems(ctx context.Context, table, text, code string) ([]vo.DictItem, error)
+	// 字典项管理
+	ListItems(ctx context.Context, dictId string, page, pageSize int) ([]entity.SysDictItem, int, error)
+	GetItemById(ctx context.Context, id string) (*entity.SysDictItem, error)
+	CreateItem(ctx context.Context, item *entity.SysDictItem, createBy string) error
+	UpdateItem(ctx context.Context, item *entity.SysDictItem, updateBy string) error
+	DeleteItem(ctx context.Context, id string) error
 }
 
 // DictListReq 字典列表请求
@@ -265,4 +271,106 @@ func (s *sysDictServiceImpl) QueryTableDictItems(ctx context.Context, table, tex
 	}
 
 	return items, nil
+}
+
+// ListItems 分页查询字典项
+func (s *sysDictServiceImpl) ListItems(ctx context.Context, dictId string, page, pageSize int) ([]entity.SysDictItem, int, error) {
+	model := dao.SysDictItem.Ctx(ctx).Where(dao.SysDictItem.Columns().DictId, dictId)
+
+	total, err := model.Count()
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var items []entity.SysDictItem
+	err = model.Page(page, pageSize).
+		OrderAsc(dao.SysDictItem.Columns().SortOrder).
+		Scan(&items)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return items, total, nil
+}
+
+// GetItemById 根据ID获取字典项
+func (s *sysDictServiceImpl) GetItemById(ctx context.Context, id string) (*entity.SysDictItem, error) {
+	var item entity.SysDictItem
+	err := dao.SysDictItem.Ctx(ctx).Where(dao.SysDictItem.Columns().Id, id).Scan(&item)
+	if err != nil {
+		return nil, err
+	}
+	if item.Id == "" {
+		return nil, nil
+	}
+	return &item, nil
+}
+
+// CreateItem 创建字典项
+func (s *sysDictServiceImpl) CreateItem(ctx context.Context, item *entity.SysDictItem, createBy string) error {
+	item.Id = guid.S()
+	item.CreateBy = createBy
+	item.CreateTime = gtime.Now()
+	item.UpdateBy = createBy
+	item.UpdateTime = gtime.Now()
+
+	_, err := dao.SysDictItem.Ctx(ctx).Data(item).Insert()
+	if err == nil {
+		// 清除缓存
+		dict, _ := s.GetById(ctx, item.DictId)
+		if dict != nil {
+			s.redisUtil.InvalidateDictCache(ctx, dict.DictCode)
+		}
+	}
+	return err
+}
+
+// UpdateItem 更新字典项
+func (s *sysDictServiceImpl) UpdateItem(ctx context.Context, item *entity.SysDictItem, updateBy string) error {
+	item.UpdateBy = updateBy
+	item.UpdateTime = gtime.Now()
+
+	_, err := dao.SysDictItem.Ctx(ctx).Data(g.Map{
+		dao.SysDictItem.Columns().ItemText:    item.ItemText,
+		dao.SysDictItem.Columns().ItemValue:   item.ItemValue,
+		dao.SysDictItem.Columns().Description: item.Description,
+		dao.SysDictItem.Columns().SortOrder:   item.SortOrder,
+		dao.SysDictItem.Columns().Status:      item.Status,
+		dao.SysDictItem.Columns().UpdateBy:    item.UpdateBy,
+		dao.SysDictItem.Columns().UpdateTime:  item.UpdateTime,
+	}).Where(dao.SysDictItem.Columns().Id, item.Id).Update()
+
+	if err == nil {
+		// 清除缓存
+		oldItem, _ := s.GetItemById(ctx, item.Id)
+		if oldItem != nil {
+			dict, _ := s.GetById(ctx, oldItem.DictId)
+			if dict != nil {
+				s.redisUtil.InvalidateDictCache(ctx, dict.DictCode)
+			}
+		}
+	}
+	return err
+}
+
+// DeleteItem 删除字典项
+func (s *sysDictServiceImpl) DeleteItem(ctx context.Context, id string) error {
+	// 获取字典项信息
+	item, err := s.GetItemById(ctx, id)
+	if err != nil {
+		return err
+	}
+	if item == nil {
+		return gerror.New("字典项不存在")
+	}
+
+	_, err = dao.SysDictItem.Ctx(ctx).Where(dao.SysDictItem.Columns().Id, id).Delete()
+	if err == nil {
+		// 清除缓存
+		dict, _ := s.GetById(ctx, item.DictId)
+		if dict != nil {
+			s.redisUtil.InvalidateDictCache(ctx, dict.DictCode)
+		}
+	}
+	return err
 }

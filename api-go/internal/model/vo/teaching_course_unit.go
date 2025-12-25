@@ -7,7 +7,10 @@ type CourseUnitListReq struct {
 
 // CourseUnitListRes 课程单元列表响应
 type CourseUnitListRes struct {
-	Records []UnitItem `json:"records"`
+	Records  []UnitItem `json:"records"`
+	Total    int        `json:"total"`
+	Page     int        `json:"pageNo"`
+	PageSize int        `json:"pageSize"`
 }
 
 // CourseUnitCreateReq 创建课程单元请求

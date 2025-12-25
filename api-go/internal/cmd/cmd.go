@@ -9,6 +9,7 @@ import (
 	"github.com/gogf/gf/v2/os/gtime"
 	"teaching-open/api/middleware"
 	"teaching-open/internal/controller/system"
+	"teaching-open/internal/controller/teaching"
 )
 
 var (
@@ -58,6 +59,12 @@ func registerRoutes(s *ghttp.Server) {
 	departCtrl := system.NewSysDepartController()
 	// 字典控制器
 	dictCtrl := system.NewSysDictController()
+	// 课程控制器
+	courseCtrl := teaching.NewTeachingCourseController()
+	// 课程单元控制器
+	courseUnitCtrl := teaching.NewTeachingCourseUnitController()
+	// 课程部门控制器
+	courseDeptCtrl := teaching.NewTeachingCourseDeptController()
 
 	// 系统模块路由组
 	s.Group("/sys", func(group *ghttp.RouterGroup) {
@@ -141,6 +148,43 @@ func registerRoutes(s *ghttp.Server) {
 			dictItemGroup.POST("/add", dictCtrl.AddItem)
 			dictItemGroup.PUT("/edit", dictCtrl.EditItem)
 			dictItemGroup.DELETE("/delete", dictCtrl.DeleteItem)
+		})
+	})
+
+	// 教学模块路由组
+	s.Group("/teaching", func(group *ghttp.RouterGroup) {
+		group.Middleware(middleware.Auth)
+
+		// 课程管理
+		group.Group("/teachingCourse", func(courseGroup *ghttp.RouterGroup) {
+			courseGroup.GET("/list", courseCtrl.List)
+			courseGroup.GET("/getHomeCourse", courseCtrl.GetHomeCourse)
+			courseGroup.POST("/add", courseCtrl.Add)
+			courseGroup.PUT("/edit", courseCtrl.Edit)
+			courseGroup.DELETE("/delete", courseCtrl.Delete)
+			courseGroup.GET("/queryById", courseCtrl.QueryById)
+			courseGroup.PUT("/publish", courseCtrl.Publish)
+		})
+
+		// 课程单元管理
+		group.Group("/teachingCourseUnit", func(unitGroup *ghttp.RouterGroup) {
+			unitGroup.GET("/list", courseUnitCtrl.List)
+			unitGroup.GET("/queryByCourseId", courseUnitCtrl.QueryByCourseId)
+			unitGroup.POST("/add", courseUnitCtrl.Add)
+			unitGroup.PUT("/edit", courseUnitCtrl.Edit)
+			unitGroup.DELETE("/delete", courseUnitCtrl.Delete)
+			unitGroup.GET("/queryById", courseUnitCtrl.QueryById)
+			unitGroup.PUT("/sort", courseUnitCtrl.Sort)
+		})
+
+		// 课程部门关联管理
+		group.Group("/teachingCourseDept", func(deptGroup *ghttp.RouterGroup) {
+			deptGroup.GET("/list", courseDeptCtrl.List)
+			deptGroup.GET("/queryByDeptId", courseDeptCtrl.QueryByDeptId)
+			deptGroup.GET("/queryByCourseId", courseDeptCtrl.QueryByCourseId)
+			deptGroup.POST("/addOrUpdate", courseDeptCtrl.AddOrUpdate)
+			deptGroup.DELETE("/delete", courseDeptCtrl.Delete)
+			deptGroup.POST("/batchAdd", courseDeptCtrl.BatchAdd)
 		})
 	})
 }

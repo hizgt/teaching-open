@@ -14,7 +14,10 @@ type CourseDeptListReq struct {
 
 // CourseDeptListRes 课程部门关联列表响应
 type CourseDeptListRes struct {
-	Records []CourseDeptItem `json:"records"`
+	Records  []CourseDeptItem `json:"records"`
+	Total    int              `json:"total"`
+	Page     int              `json:"pageNo"`
+	PageSize int              `json:"pageSize"`
 }
 
 // CourseDeptItem 课程部门关联项
@@ -31,4 +34,10 @@ type CourseDeptItem struct {
 // CourseDeptRemoveReq 移除课程部门关联请求
 type CourseDeptRemoveReq struct {
 	Id string `json:"id" v:"required" dc:"关联ID"`
+}
+
+// CourseDeptBatchAddReq 批量添加课程部门关联请求
+type CourseDeptBatchAddReq struct {
+	CourseIds []string `json:"courseIds" v:"required" dc:"课程ID列表"`
+	DeptIds   []string `json:"deptIds" v:"required" dc:"部门ID列表"`
 }

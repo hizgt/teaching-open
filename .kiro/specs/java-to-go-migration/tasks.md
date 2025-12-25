@@ -260,20 +260,20 @@
 - [ ] 10. Checkpoint - 系统模块验证
   - 确保所有测试通过，如有问题请询问用户
 
-- [ ] 11. 课程模块
-  - [ ] 11.1 课程实体定义
+- [x] 11. 课程模块
+  - [x] 11.1 课程实体定义
     - 创建internal/model/entity/teaching_course.go
     - 创建internal/model/entity/teaching_course_unit.go
     - 创建internal/model/entity/teaching_course_dept.go
     - _Requirements: 6.1, 6.2_
 
-  - [ ] 11.2 课程DAO层实现
+  - [x] 11.2 课程DAO层实现
     - 创建internal/dao/teaching_course.go
     - 创建internal/dao/teaching_course_unit.go
     - 创建internal/dao/teaching_course_dept.go
     - _Requirements: 6.1, 6.2, 6.5_
 
-  - [ ] 11.3 课程Service层实现
+  - [x] 11.3 课程Service层实现
     - 创建internal/service/teaching_course.go
     - 实现ITeachingCourseService接口
     - 实现课程列表查询(部门授权过滤)
@@ -286,17 +286,18 @@
     - **Property 9: Course Department Authorization**
     - **Validates: Requirements 6.3**
 
-  - [ ] 11.5 课程单元Service实现
+  - [x] 11.5 课程单元Service实现
     - 创建internal/service/teaching_course_unit.go
     - 实现ITeachingCourseUnitService接口
     - _Requirements: 6.2_
 
-  - [ ] 11.6 课程Controller实现
+  - [x] 11.6 课程Controller实现
     - 创建internal/controller/teaching/teaching_course.go
     - 创建internal/controller/teaching/teaching_course_unit.go
     - 实现课程管理接口
     - 实现课程单元管理接口
     - _Requirements: 6.1, 6.2_
+    - **注意**: 路由需要在cmd.go中注册
 
 - [ ] 12. 作业模块
   - [ ] 12.1 作业实体定义

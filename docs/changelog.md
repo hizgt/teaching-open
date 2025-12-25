@@ -77,6 +77,28 @@
 
 ---
 
+### 课程管理模块路由注册 ✅
+
+#### Added
+- **课程Controller重构**
+  - 统一使用 ghttp.Request 模式（与系统模块一致）
+  - 新增 GetHomeCourse 首页课程接口
+
+- **课程单元Controller重构**
+  - 新增 QueryByCourseId、QueryById 方法
+  - 统一使用 ghttp.Request 模式
+
+- **课程部门Controller重构**
+  - 新增 QueryByDeptId、QueryByCourseId、BatchAdd 方法
+  - 统一使用 ghttp.Request 模式
+
+- **路由注册更新**
+  - 新增 `/teaching/teachingCourse/*` 课程管理路由组（7个接口）
+  - 新增 `/teaching/teachingCourseUnit/*` 课程单元路由组（7个接口）
+  - 新增 `/teaching/teachingCourseDept/*` 课程部门路由组（6个接口）
+
+---
+
 ## [3.0.0-dev] - 2025-12-25
 
 ### 角色权限模块完善 ✅

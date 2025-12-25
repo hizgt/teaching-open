@@ -17,6 +17,9 @@ type TeachingCourseDeptService interface {
 	List(ctx context.Context, req *vo.CourseDeptListReq) (*vo.CourseDeptListRes, error)
 	Assign(ctx context.Context, req *vo.CourseDeptAssignReq, userId string) error
 	Remove(ctx context.Context, req *vo.CourseDeptRemoveReq, userId string) error
+	QueryByDeptId(ctx context.Context, deptId string) ([]vo.CourseItem, error)
+	QueryByCourseId(ctx context.Context, courseId string) ([]vo.DeptItem, error)
+	BatchAdd(ctx context.Context, req *vo.CourseDeptBatchAddReq, userId string) error
 }
 
 // teachingCourseDeptServiceImpl 课程部门关联服务实现
@@ -138,4 +141,93 @@ func (s *teachingCourseDeptServiceImpl) Remove(ctx context.Context, req *vo.Cour
 	// 删除关联
 	_, err = dao.CourseDept.Ctx(ctx).Where(dao.CourseDept.Columns().Id, req.Id).Delete()
 	return err
+}
+
+// QueryByDeptId 根据部门ID查询课程
+func (s *teachingCourseDeptServiceImpl) QueryByDeptId(ctx context.Context, deptId string) ([]vo.CourseItem, error) {
+	var relations []entity.TeachingCourseDept
+	err := dao.CourseDept.Ctx(ctx).Where(dao.CourseDept.Columns().DeptId, deptId).Scan(&relations)
+	if err != nil {
+		return nil, err
+	}
+
+	var records []vo.CourseItem
+	for _, relation := range relations {
+		var course entity.TeachingCourse
+		err = dao.Course.Ctx(ctx).Where(dao.Course.Columns().Id, relation.CourseId).Scan(&course)
+		if err != nil || course.Id == "" {
+			continue
+		}
+
+		unitCount, _ := dao.CourseUnit.Ctx(ctx).Where(dao.CourseUnit.Columns().CourseId, course.Id).Count()
+
+		records = append(records, vo.CourseItem{
+			Id:          course.Id,
+			Name:        course.Name,
+			Type:        course.Type,
+			Description: course.Description,
+			CoverImage:  course.CoverImage,
+			Status:      course.Status,
+			CreateBy:    course.CreateBy,
+			CreateTime:  course.CreateTime.Time.Format("2006-01-02 15:04:05"),
+			UnitCount:   int(unitCount),
+		})
+	}
+
+	return records, nil
+}
+
+// QueryByCourseId 根据课程ID查询部门
+func (s *teachingCourseDeptServiceImpl) QueryByCourseId(ctx context.Context, courseId string) ([]vo.DeptItem, error) {
+	var depts []vo.DeptItem
+	err := g.DB().Ctx(ctx).Raw(`
+		SELECT d.id, d.depart_name as name 
+		FROM teaching_course_dept cd 
+		LEFT JOIN sys_depart d ON cd.dept_id = d.id 
+		WHERE cd.course_id = ? AND d.del_flag = '0'
+	`, courseId).Scan(&depts)
+	if err != nil {
+		return nil, err
+	}
+
+	return depts, nil
+}
+
+// BatchAdd 批量添加课程部门关联
+func (s *teachingCourseDeptServiceImpl) BatchAdd(ctx context.Context, req *vo.CourseDeptBatchAddReq, userId string) error {
+	if len(req.CourseIds) == 0 || len(req.DeptIds) == 0 {
+		return gerror.New("课程ID和部门ID不能为空")
+	}
+
+	var relations []g.Map
+	for _, courseId := range req.CourseIds {
+		for _, deptId := range req.DeptIds {
+			// 检查是否已存在
+			count, err := dao.CourseDept.Ctx(ctx).
+				Where(dao.CourseDept.Columns().CourseId, courseId).
+				Where(dao.CourseDept.Columns().DeptId, deptId).
+				Count()
+			if err != nil {
+				return err
+			}
+			if count > 0 {
+				continue
+			}
+
+			relations = append(relations, g.Map{
+				dao.CourseDept.Columns().Id:         guid.S(),
+				dao.CourseDept.Columns().CourseId:   courseId,
+				dao.CourseDept.Columns().DeptId:     deptId,
+				dao.CourseDept.Columns().CreateBy:   userId,
+				dao.CourseDept.Columns().CreateTime: gtime.Now(),
+			})
+		}
+	}
+
+	if len(relations) > 0 {
+		_, err := dao.CourseDept.Ctx(ctx).Data(relations).Insert()
+		return err
+	}
+
+	return nil
 }

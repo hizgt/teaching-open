@@ -20,6 +20,7 @@ type TeachingCourseService interface {
 	Delete(ctx context.Context, req *vo.CourseDeleteReq, userId string) error
 	Detail(ctx context.Context, id string) (*vo.CourseDetailRes, error)
 	Publish(ctx context.Context, req *vo.CoursePublishReq, userId string) error
+	GetHomeCourse(ctx context.Context) ([]vo.CourseItem, error)
 }
 
 // teachingCourseServiceImpl 课程服务实现
@@ -286,4 +287,36 @@ func (s *teachingCourseServiceImpl) assignCourseToDepts(ctx context.Context, cou
 	}
 
 	return nil
+}
+
+// GetHomeCourse 获取首页课程
+func (s *teachingCourseServiceImpl) GetHomeCourse(ctx context.Context) ([]vo.CourseItem, error) {
+	var courses []entity.TeachingCourse
+	err := dao.Course.Ctx(ctx).
+		Where(dao.Course.Columns().Status, "published").
+		OrderDesc(dao.Course.Columns().CreateTime).
+		Limit(10).
+		Scan(&courses)
+	if err != nil {
+		return nil, err
+	}
+
+	var records []vo.CourseItem
+	for _, course := range courses {
+		unitCount, _ := dao.CourseUnit.Ctx(ctx).Where(dao.CourseUnit.Columns().CourseId, course.Id).Count()
+
+		records = append(records, vo.CourseItem{
+			Id:          course.Id,
+			Name:        course.Name,
+			Type:        course.Type,
+			Description: course.Description,
+			CoverImage:  course.CoverImage,
+			Status:      course.Status,
+			CreateBy:    course.CreateBy,
+			CreateTime:  course.CreateTime.Time.Format("2006-01-02 15:04:05"),
+			UnitCount:   int(unitCount),
+		})
+	}
+
+	return records, nil
 }

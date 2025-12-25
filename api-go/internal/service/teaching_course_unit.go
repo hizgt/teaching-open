@@ -19,6 +19,8 @@ type TeachingCourseUnitService interface {
 	Update(ctx context.Context, req *vo.CourseUnitUpdateReq, userId string) error
 	Delete(ctx context.Context, req *vo.CourseUnitDeleteReq, userId string) error
 	Sort(ctx context.Context, req *vo.CourseUnitSortReq, userId string) error
+	QueryByCourseId(ctx context.Context, courseId string) ([]vo.UnitItem, error)
+	QueryById(ctx context.Context, id string) (*vo.UnitItem, error)
 }
 
 // teachingCourseUnitServiceImpl 课程单元服务实现
@@ -255,4 +257,49 @@ func (s *teachingCourseUnitServiceImpl) reorderUnits(ctx context.Context, course
 	}
 
 	return nil
+}
+
+// QueryByCourseId 根据课程ID查询单元
+func (s *teachingCourseUnitServiceImpl) QueryByCourseId(ctx context.Context, courseId string) ([]vo.UnitItem, error) {
+	var units []entity.TeachingCourseUnit
+	err := dao.CourseUnit.Ctx(ctx).
+		Where(dao.CourseUnit.Columns().CourseId, courseId).
+		OrderAsc(dao.CourseUnit.Columns().SortOrder).
+		Scan(&units)
+	if err != nil {
+		return nil, err
+	}
+
+	var records []vo.UnitItem
+	for _, unit := range units {
+		records = append(records, vo.UnitItem{
+			Id:          unit.Id,
+			Name:        unit.Name,
+			Content:     unit.Content,
+			SortOrder:   unit.SortOrder,
+			ResourceUrl: unit.ResourceUrl,
+		})
+	}
+
+	return records, nil
+}
+
+// QueryById 根据ID查询单元
+func (s *teachingCourseUnitServiceImpl) QueryById(ctx context.Context, id string) (*vo.UnitItem, error) {
+	var unit entity.TeachingCourseUnit
+	err := dao.CourseUnit.Ctx(ctx).Where(dao.CourseUnit.Columns().Id, id).Scan(&unit)
+	if err != nil {
+		return nil, err
+	}
+	if unit.Id == "" {
+		return nil, gerror.New("课程单元不存在")
+	}
+
+	return &vo.UnitItem{
+		Id:          unit.Id,
+		Name:        unit.Name,
+		Content:     unit.Content,
+		SortOrder:   unit.SortOrder,
+		ResourceUrl: unit.ResourceUrl,
+	}, nil
 }

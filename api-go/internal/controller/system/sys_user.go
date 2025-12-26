@@ -1,10 +1,14 @@
 package system
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/gogf/gf/v2/net/ghttp"
 
 	"teaching-open/internal/model/vo"
 	"teaching-open/internal/service"
+	"teaching-open/utility/export"
 	"teaching-open/utility/response"
 )
 
@@ -201,4 +205,118 @@ func (c *SysUserController) QueryById(r *ghttp.Request) {
 	}
 
 	response.Success(r, user)
+}
+
+// ExportXls 导出用户列表(Excel)
+// @Summary 导出用户列表(Excel)
+// @Tags 系统-用户管理
+// @Accept json
+// @Produce application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @Param username query string false "用户名"
+// @Param realname query string false "真实姓名"
+// @Param phone query string false "手机号"
+// @Param status query int false "状态"
+// @Success 200 {file} file
+// @Router /sys/user/exportXls [get]
+func (c *SysUserController) ExportXls(r *ghttp.Request) {
+	var req vo.UserListReq
+	if err := r.Parse(&req); err != nil {
+		response.Error(r, err.Error())
+		return
+	}
+
+	// 不分页，导出所有数据
+	req.Page = 1
+	req.PageSize = 10000
+
+	res, err := c.userService.List(r.Context(), &req)
+	if err != nil {
+		response.Error(r, err.Error())
+		return
+	}
+
+	// 转换为map格式
+	users := make([]map[string]interface{}, 0, len(res.Records))
+	for _, user := range res.Records {
+		users = append(users, map[string]interface{}{
+			"username":   user.Username,
+			"realname":   user.Realname,
+			"sex":        user.Sex,
+			"phone":      user.Phone,
+			"email":      user.Email,
+			"departName": user.OrgCodeTxt,
+			"status":     user.Status,
+			"createTime": user.CreateTime,
+		})
+	}
+
+	// 导出Excel
+	buffer, err := export.ExportUserList(users)
+	if err != nil {
+		response.Error(r, err.Error())
+		return
+	}
+
+	// 设置响应头
+	filename := fmt.Sprintf("用户列表_%s.xlsx", time.Now().Format("20060102150405"))
+	r.Response.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	r.Response.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	r.Response.Write(buffer)
+}
+
+// ExportCsv 导出用户列表(CSV)
+// @Summary 导出用户列表(CSV)
+// @Tags 系统-用户管理
+// @Accept json
+// @Produce text/csv
+// @Param username query string false "用户名"
+// @Param realname query string false "真实姓名"
+// @Param phone query string false "手机号"
+// @Param status query int false "状态"
+// @Success 200 {file} file
+// @Router /sys/user/exportCsv [get]
+func (c *SysUserController) ExportCsv(r *ghttp.Request) {
+	var req vo.UserListReq
+	if err := r.Parse(&req); err != nil {
+		response.Error(r, err.Error())
+		return
+	}
+
+	// 不分页，导出所有数据
+	req.Page = 1
+	req.PageSize = 10000
+
+	res, err := c.userService.List(r.Context(), &req)
+	if err != nil {
+		response.Error(r, err.Error())
+		return
+	}
+
+	// 转换为map格式
+	users := make([]map[string]interface{}, 0, len(res.Records))
+	for _, user := range res.Records {
+		users = append(users, map[string]interface{}{
+			"username":   user.Username,
+			"realname":   user.Realname,
+			"sex":        user.Sex,
+			"phone":      user.Phone,
+			"email":      user.Email,
+			"departName": user.OrgCodeTxt,
+			"status":     user.Status,
+			"createTime": user.CreateTime,
+		})
+	}
+
+	// 导出CSV
+	buffer, err := export.ExportUserListCSV(users)
+	if err != nil {
+		response.Error(r, err.Error())
+		return
+	}
+
+	// 设置响应头
+	filename := fmt.Sprintf("用户列表_%s.csv", time.Now().Format("20060102150405"))
+	r.Response.Header().Set("Content-Type", "text/csv; charset=utf-8")
+	r.Response.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	r.Response.Write(buffer)
 }

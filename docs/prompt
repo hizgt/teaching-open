@@ -10,7 +10,7 @@
 
 
 编写代码继续进行功能迁移开发
-1、根据梳理的 docs/{timestampYYYYMMDD}/未完成工作报告.md和 changelog 以及分析docs下的内容，
+1、根据梳理的 docs/{timestampYYYYMMDD}/未完成工作报告.md和 changelog 以及分析docs,.kiro下下的内容，
 2、请阅读分析根据docs/goFrame dev guide.md，docs/Vue3 Dev Guide.md和docs/PRD.md 三个文档的代码规范以及现有的代码内容，
 3、对相应的的内容进行相应的开发,请先生成相应的前后端的开发计划，并按照安排进行功能开发，
 4、每个功能开发完成后更新报告，并且要编译通过，并且要通过go build 构建成功才行， changelog 以及进行 git 的修改；将每个任务进行分解到子任务进行分治解决。
